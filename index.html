@@ -1,1 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>API to Supabase</title>
+</head>
+<body>
+  <h1>Uploading Player Data...</h1>
+  <div id="status">Please wait...</div>
+
+  <script>
+    const PARSEHUB_API = "https://parsehub.com/api/v2/projects/tcWHZ7BG59Lf/last_ready_run/data?api_key=tGTyk1ggHyCM&format=json";
+
+    const SUPABASE_URL = "https://awphrlwerfqwcclyswld.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3cGhybHdlcmZxd2NjbHlzd2xkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4Mzc3NDUsImV4cCI6MjA3MDQxMzc0NX0.0cuCmmoy3uSdY4s4z-fTHU1E7RBi8vS2FjRKEYqb3xA";
+
+    async function sendDataToSupabase() {
+      try {
+        // 1. Get data from ParseHub
+        const parseRes = await fetch(PARSEHUB_API);
+        if (!parseRes.ok) throw new Error("Failed to fetch ParseHub data");
+        const playerData = await parseRes.json();
+
+        // 2. Send data to Supabase
+        const supabaseRes = await fetch(`${SUPABASE_URL}/rest/v1/players`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify(playerData)
+        });
+
+        if (!supabaseRes.ok) throw new Error("Failed to upload to Supabase");
+
+        document.getElementById("status").innerText = "✅ Data uploaded successfully!";
+      } catch (err) {
+        console.error(err);
+        document.getElementById("status").innerText = "❌ Error: " + err.message;
+      }
+    }
+
+    sendDataToSupabase();
+  </script>
+</body>
+</html>
 
